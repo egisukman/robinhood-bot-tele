@@ -1,11 +1,24 @@
 import os
 import time
 import requests
+import threading
+from flask import Flask
 from web3 import Web3
 
 # ------------------------------------------------------------------
 # CONFIGURATION & TELEGRAM CREDENTIALS
 # ------------------------------------------------------------------
+
+app = Flask(__name__)
+
+@app.route('/')
+def home():
+    return "Bot Robinhood Active 24/7!"
+
+def run_flask():
+    port = int(os.environ.get("PORT", 8080))
+    app.run(host='0.0.0.0', port=port)
+
 RPC_URL = "https://rpc.mainnet.chain.robinhood.com"
 w3 = Web3(Web3.HTTPProvider(RPC_URL))
 
@@ -178,4 +191,8 @@ def main_loop():
             time.sleep(5)
 
 if __name__ == "__main__":
+    # Jalankan server Flask di background thread
+    threading.Thread(target=run_flask, daemon=True).start()
+    
+    # Jalankan loop bot utama
     main_loop()
